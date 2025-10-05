@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Gradient Background</title>
+    <style>
+        /* Define color variables */
+        :root {
+            --color-bg1: #0f0f23; /* Dark Blue */
+            --color-bg2: #532c3f; /* Dark Magenta/Red */
+            --color1: #ff9800;   /* Orange */
+            --color2: #ff5722;   /* Deep Orange */
+            --color3: #ffc107;   /* Amber */
+            --color4: #795548;   /* Brownish (from Diya) */
+            --color5: #3b1e3f;   /* Deep Purple */
+        }
+        
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Body styling */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--color-bg1);
+            overflow: hidden; /* Prevents scrollbars */
+            min-height: 100vh;
+        }
+
+        /* The main container for the animated gradient */
+        .gradient-bg {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2), var(--color-bg1));
+        }
+        
+        /* Pseudo-element for the animated blobs */
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background-image: 
+                radial-gradient(circle at 100% 0%, var(--color1) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, var(--color2) 0%, transparent 50%);
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: moveGradient 15s ease-in-out infinite alternate;
+        }
+        
+        /* A second pseudo-element for more color depth */
+        .gradient-bg::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background-image: 
+                radial-gradient(circle at 0% 0%, var(--color3) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, var(--color5) 0%, transparent 40%);
+            filter: blur(90px);
+            opacity: 0.6;
+            animation: moveGradient2 18s ease-in-out infinite alternate;
+            animation-delay: -3s; /* Start at a different time */
+        }
+        
+        /* Keyframe animation for the first set of blobs */
+        @keyframes moveGradient {
+            0% {
+                transform: translate(-10%, -10%) rotate(0deg) scale(1);
+            }
+            100% {
+                transform: translate(10%, 10%) rotate(360deg) scale(1.2);
+            }
+        }
+        
+        /* Keyframe animation for the second set of blobs */
+        @keyframes moveGradient2 {
+            0% {
+                transform: translate(10%, 10%) rotate(0deg) scale(0.8);
+            }
+            100% {
+                transform: translate(-10%, -10%) rotate(-360deg) scale(1);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="gradient-bg">
+        </div>
+
+</body>
+</html>
