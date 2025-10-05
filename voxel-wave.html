@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Wave</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="voxel-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('voxel-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Configuration ---
+        const GRID_SIZE = 12; // How many cubes across, down, and deep (e.g., 10x10x10)
+        const CUBE_SIZE = 20;
+        const SPACING = 50;
+        const WAVE_SPEED = 0.05;
+        const WAVE_LENGTH = 1.5;
+        const ROTATION_SPEED = 0.005;
+
+        let cubes = [];
+        let time = 0;
+        let angleX = 0;
+        let angleY = 0;
+
+        // --- 3D Point & Cube Classes ---
+        class Point3D {
+            constructor(x, y, z) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+        }
+
+        class Cube {
+            constructor(x, y, z, size) {
+                this.center = new Point3D(x, y, z);
+                // Define the 8 vertices of the cube relative to its center
+                this.vertices = [
+                    new Point3D(x - size, y - size, z - size),
+                    new Point3D(x + size, y - size, z - size),
+                    new Point3D(x + size, y + size, z - size),
+                    new Point3D(x - size, y + size, z - size),
+                    new Point3D(x - size, y - size, z + size),
+                    new Point3D(x + size, y - size, z + size),
+                    new Point3D(x + size, y + size, z + size),
+                    new Point3D(x - size, y + size, z + size)
+                ];
+                this.distanceFromCenter = Math.sqrt(x*x + z*z); // Distance for the wave effect
+            }
+
+            project(angleX, angleY) {
+                const projectedVertices = [];
+                for (const vertex of this.vertices) {
+                    // Rotate around Y axis
+                    let rotY_X = vertex.x * Math.cos(angleY) - vertex.z * Math.sin(angleY);
+                    let rotY_Z = vertex.x * Math.sin(angleY) + vertex.z * Math.cos(angleY);
+                    
+                    // Rotate around X axis
+                    let rotX_Y = vertex.y * Math.cos(angleX) - rotY_Z * Math.sin(angleX);
+                    let rotX_Z = vertex.y * Math.sin(angleX) + rotY_Z * Math.cos(angleX);
+                    
+                    const perspective = 400 / (400 + rotX_Z); // Simple perspective
+                    
+                    const screenX = canvas.width / 2 + rotY_X * perspective;
+                    const screenY = canvas.height / 2 + rotX_Y * perspective;
+                    
+                    projectedVertices.push({ x: screenX, y: screenY });
+                }
+                return projectedVertices;
+            }
+
+            draw(projected) {
+                const wave = Math.sin(this.distanceFromCenter * WAVE_LENGTH - time);
+                const brightness = (wave + 1) / 2; // Normalize to 0-1
+                const scale = 0.5 + brightness * 1.5; // Pulse size with the wave
+
+                if (brightness < 0.1) return; // Don't draw if it's too dim
+                
+                ctx.strokeStyle = `rgba(255, 193, 7, ${brightness * 0.8})`;
+                ctx.lineWidth = 1 * scale;
+                
+                // Draw the 12 edges of the cube
+                const edges = [
+                    [0, 1], [1, 2], [2, 3], [3, 0], // Back face
+                    [4, 5], [5, 6], [6, 7], [7, 4], // Front face
+                    [0, 4], [1, 5], [2, 6], [3, 7]  // Connecting edges
+                ];
+
+                for (const edge of edges) {
+                    ctx.beginPath();
+                    ctx.moveTo(projected[edge[0]].x, projected[edge[0]].y);
+                    ctx.lineTo(projected[edge[1]].x, projected[edge[1]].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // --- Initialization ---
+        function init() {
+            cubes = [];
+            const offset = (GRID_SIZE - 1) * SPACING / 2;
+            for (let x = 0; x < GRID_SIZE; x++) {
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let z = 0; z < GRID_SIZE; z++) {
+                        const cubeX = x * SPACING - offset;
+                        const cubeY = y * SPACING - offset;
+                        const cubeZ = z * SPACING - offset;
+                        cubes.push(new Cube(cubeX, cubeY, cubeZ, CUBE_SIZE / 2));
+                    }
+                }
+            }
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            angleX += ROTATION_SPEED;
+            angleY += ROTATION_SPEED;
+            time += WAVE_SPEED;
+            
+            // Sort cubes by Z distance to draw back-to-front for proper layering
+            cubes.sort((a, b) => {
+                const z_a = a.center.z * Math.cos(angleY) + a.center.x * Math.sin(angleY);
+                const z_b = b.center.z * Math.cos(angleY) + b.center.x * Math.sin(angleY);
+                return z_b - z_a;
+            });
+            
+            for (const cube of cubes) {
+                const projected = cube.project(angleX, angleY);
+                cube.draw(projected);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        // --- Start ---
+        init();
+        animate();
+    </script>
+</body>
+</html>
