@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Architect - Animated Blueprint</title>
+    <style>
+        body {
+            background-color: #0f0f23;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .blueprint-svg {
+            width: 90vw;
+            height: 90vh;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Styling for all shapes within the SVG */
+        .blueprint-svg path,
+        .blueprint-svg rect,
+        .blueprint-svg circle,
+        .blueprint-svg polyline {
+            fill: none;
+            stroke: #ffc107; /* The amber color from your theme */
+            stroke-width: 1;
+
+            /* This is the core trick for the drawing animation */
+            /* 1. Get the total length of the line */
+            stroke-dasharray: 1000; 
+            /* 2. Start the "dash" way off-screen, making the line invisible */
+            stroke-dashoffset: 1000;
+            /* 3. Animate the dash offset back to 0, "drawing" the line */
+            animation: draw 5s linear infinite;
+        }
+
+        /* The animation keyframes */
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* To make it look more dynamic, we apply different animation delays
+        and directions to various parts of the schematic.
+        */
+
+        #grid {
+            stroke: rgba(255, 193, 7, 0.1); /* Faint grid */
+            animation: none; /* The grid doesn't draw itself */
+        }
+        
+        #box-1 { animation-delay: -1s; }
+        #box-2 { animation-delay: -2s; animation-direction: alternate; }
+
+        #circuit-1 { animation-duration: 8s; }
+        #circuit-2 { animation-duration: 10s; animation-delay: -3s; }
+        #circuit-3 { animation-duration: 6s; animation-delay: -5s; animation-direction: alternate; }
+        
+        #circles g:nth-child(1) circle { animation-delay: -0.5s; }
+        #circles g:nth-child(2) circle { animation-delay: -1.5s; }
+        #circles g:nth-child(3) circle { animation-delay: -2.5s; animation-direction: reverse; }
+        #circles g:nth-child(4) circle { animation-delay: -3.5s; }
+
+    </style>
+</head>
+<body>
+
+    <svg class="blueprint-svg" viewBox="0 0 400 300">
+        <g id="grid">
+            <path d="M 10,0 L 10,300 M 20,0 L 20,300 M 30,0 L 30,300 M 40,0 L 40,300 M 50,0 L 50,300 M 60,0 L 60,300 M 70,0 L 70,300 M 80,0 L 80,300 M 90,0 L 90,300 M 110,0 L 110,300 M 120,0 L 120,300 M 130,0 L 130,300 M 140,0 L 140,300 M 150,0 L 150,300 M 160,0 L 160,300 M 170,0 L 170,300 M 180,0 L 180,300 M 190,0 L 190,300 M 210,0 L 210,300 M 220,0 L 220,300 M 230,0 L 230,300 M 240,0 L 240,300 M 250,0 L 250,300 M 260,0 L 260,300 M 270,0 L 270,300 M 280,0 L 280,300 M 290,0 L 290,300 M 310,0 L 310,300 M 320,0 L 320,300 M 330,0 L 330,300 M 340,0 L 340,300 M 350,0 L 350,300 M 360,0 L 360,300 M 370,0 L 370,300 M 380,0 L 380,300 M 390,0 L 390,300" stroke-width="0.2"/>
+            <path d="M 0,10 L 400,10 M 0,20 L 400,20 M 0,30 L 400,30 M 0,40 L 400,40 M 0,50 L 400,50 M 0,60 L 400,60 M 0,70 L 400,70 M 0,80 L 400,80 M 0,90 L 400,90 M 0,110 L 400,110 M 0,120 L 400,120 M 0,130 L 400,130 M 0,140 L 400,140 M 0,150 L 400,150 M 0,160 L 400,160 M 0,170 L 400,170 M 0,180 L 400,180 M 0,190 L 400,190 M 0,210 L 400,210 M 0,220 L 400,220 M 0,230 L 400,230 M 0,240 L 400,240 M 0,250 L 400,250 M 0,260 L 400,260 M 0,270 L 400,270 M 0,280 L 400,280 M 0,290 L 400,290" stroke-width="0.2"/>
+        </g>
+        
+        <rect x="1" y="1" width="398" height="298" stroke-width="2"/>
+
+        <g id="boxes">
+            <rect id="box-1" x="25" y="25" width="150" height="100"/>
+            <rect id="box-2" x="225" y="175" width="150" height="100"/>
+        </g>
+
+        <g id="circuits">
+            <polyline id="circuit-1" points="175,75 250,75 250,175"/>
+            <polyline id="circuit-2" points="25,125 100,125 100,225 225,225"/>
+            <path id="circuit-3" d="M25,50 C 50,10 150,10 175,50"/>
+        </g>
+
+        <g id="circles">
+            <g>
+                <circle cx="250" cy="50" r="20"/>
+                <circle cx="250" cy="50" r="10"/>
+            </g>
+            <g>
+                <circle cx="100" cy="200" r="15"/>
+            </g>
+            <g>
+                <circle cx="350" cy="100" r="30"/>
+                <circle cx="350" cy="100" r="25"/>
+                <circle cx="350" cy="100" r="5"/>
+            </g>
+             <g>
+                <circle cx="50" cy="250" r="20"/>
+            </g>
+        </g>
+    </svg>
+
+</body>
+</html>
