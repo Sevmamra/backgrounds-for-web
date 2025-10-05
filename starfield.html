@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starfield Background</title>
+    <style>
+        /* Basic reset and body styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #0f0f23; /* Dark blue background */
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* NEW: Nebula Effect */
+        /* This pseudo-element creates the soft, colorful cloud in the background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80vmax; /* Use viewport units for responsiveness */
+            height: 80vmax;
+            background: radial-gradient(circle at center, 
+                rgba(255, 152, 0, 0.3) 0%, /* --primary color with opacity */
+                rgba(121, 85, 72, 0.2) 30%,  /* Brownish color with opacity */
+                rgba(15, 15, 35, 0) 70%     /* Fades to transparent */
+            );
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(100px);
+            opacity: 0.8;
+            /* A very slow rotation animation for the nebula */
+            animation: rotate-nebula 200s infinite linear;
+        }
+
+        /* The container for all star layers */
+        .stars-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate-scene 90s infinite linear;
+        }
+
+        /* Each div will be a layer of stars */
+        .stars {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            /* NEW: Added twinkling animation to all stars */
+            animation: 
+                move-stars 50s infinite linear,
+                twinkle 4s infinite alternate;
+        }
+        
+        /* Keyframes for moving stars from center to the edge */
+        @keyframes move-stars {
+            from { transform: translateZ(0); }
+            to { transform: translateZ(2000px); }
+        }
+        
+        /* Keyframes for rotating the entire star scene */
+        @keyframes rotate-scene {
+            from { transform: perspective(600px) rotateZ(0deg); }
+            to { transform: perspective(600px) rotateZ(360deg); }
+        }
+        
+        /* NEW: Keyframes for the twinkling effect */
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* NEW: Keyframes for the nebula rotation */
+        @keyframes rotate-nebula {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Layer 1: Smallest, fastest stars (closest) */
+        .stars:nth-child(1) {
+            animation-duration: 50s, 3s; /* move-stars, twinkle */
+            box-shadow: 
+                187vw -37vh #FFF, 172vw 46vh #FFF, 14vw -12vh #FFF, -32vw -3vh #FFC107, 10vw 8vh #FFF, 126vw -62vh #FFF, -17vw -11vh #FFF, 185vw 3vh #FFC107, 43vw -34vh #FFF, 129vw -59vh #FFF, 142vw 82vh #FFF, 155vw 55vh #FFF, 122vw -97vh #FFF, 16vw 88vh #FFF, 13vw 89vh #FFF, -1vw -98vh #FFC107, 172vw -22vh #FFF, 170vw -8vh #FFF, 15vw 41vh #FFF, -15vw 52vh #FFF, 151vw -82vh #FFF, -1vw 3vh #FFF, 5vw -20vh #FFF, 102vw 50vh #FFF, 62vw 8vh #FFF, 100vw 37vh #FF9800, -11vw 4vh #FFF, 182vw 35vh #FFF, 24vw -26vh #FFF, 137vw -93vh #FFF, 108vw -67vh #FFF, 3vw 69vh #FFF, 160vw 30vh #FFF, -2vw -92vh #FFF, 13vw 3vh #FFF, 161vw 73vh #FFF, 131vw -11vh #FF9800, 168vw 41vh #FFF, 139vw 78vh #FFF, 176vw 53vh #FFF, 171vw 85vh #FFF, -27vw 2vh #FFF, 107vw 11vh #FFF, 116vw 51vh #FFF, 123vw -23vh #FFF, 8vw -69vh #FFF, -2vw -96vh #FFF, 14vw -18vh #FFF;
+        }
+        
+        /* Layer 2: Medium size, medium speed stars */
+        .stars:nth-child(2) {
+            animation-duration: 100s, 4s; /* move-stars, twinkle */
+            box-shadow: 
+                -21vw -42vh #FFF, -4vw 48vh #FFF, -15vw -39vh #FFC107, -40vw 33vh #FFF, -32vw -1vh #FFF, 24vw -13vh #FFF, 12vw 15vh #FF9800, -16vw 25vh #FFF, 3vw 12vh #FFF, 25vw -28vh #FFF, 29vw 16vh #FFF, -11vw -1vh #FFF, 2vw -31vh #FFF, 28vw 38vh #FFF, -39vw -41vh #FFF, 3vw 40vh #FFF, 1vw -15vh #FFF, 20vw -49vh #FFC107, -32vw -40vh #FFF, -2vw -13vh #FFF, -1vw 19vh #FFF, -13vw 19vh #FFF, -16vw -16vh #FFF, -2vw -32vh #FFF, -30vw 23vh #FFF, 34vw 14vh #FFF, -3vw -21vh #FF9800, -32vw -24vh #FFF, 13vw -18vh #FFF, 18vw 34vh #FFF, 20vw -22vh #FFF;
+        }
+        
+        /* Layer 3: Largest, slowest stars (furthest) */
+        .stars:nth-child(3) {
+            animation-duration: 150s, 5s; /* move-stars, twinkle */
+            box-shadow: 
+                6vw -4vh #FFF, 14vw 10vh #FFF, -2vw 9vh #FFC107, 12vw 13vh #FFF, -8vw -8vh #FFF, 11vw 11vh #FF9800, -1vw 13vh #FFF, 2vw -7vh #FFF, 8vw -3vh #FFF, -13vw -9vh #FFF, -11vw 10vh #FFF, 9vw -14vh #FFF;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="stars-container">
+        <div class="stars"></div>
+        <div class="stars"></div>
+        <div class="stars"></div>
+    </div>
+
+</body>
+</html>
