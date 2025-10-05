@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythmic Equalizer</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #0f0f23;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="equalizer-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('equalizer-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Configuration ---
+        const BAR_COUNT = 128; // Number of bars. More bars = finer detail.
+        const BAR_COLOR_TOP = '#ffc107'; // Amber color from your theme
+        const BAR_COLOR_BOTTOM = '#ff5722'; // Deep orange for the gradient
+        
+        let time = 0; // A counter that drives the animation
+
+        // --- Bar Class ---
+        class Bar {
+            constructor(x, y, width, height, index) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.index = index;
+            }
+
+            // The height of the bar is calculated using sine waves for a smooth, rhythmic motion.
+            // Combining multiple sine waves creates a more complex and interesting pattern.
+            update() {
+                const wave1 = Math.sin(this.index * 0.1 + time * 0.05);
+                const wave2 = Math.sin(this.index * 0.05 + time * 0.02);
+                const wave3 = Math.cos(this.index * 0.15 + time * 0.08);
+
+                const baseHeight = canvas.height * 0.2;
+                const waveHeight = canvas.height * 0.3;
+                
+                // The final height is a combination of the waves and a base height
+                this.height = baseHeight + (wave1 + wave2 + wave3) / 3 * waveHeight;
+            }
+
+            draw() {
+                // Create a vertical gradient for each bar to give it a glowing look
+                const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - this.height);
+                gradient.addColorStop(0, BAR_COLOR_BOTTOM);
+                gradient.addColorStop(1, BAR_COLOR_TOP);
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(this.x, canvas.height - this.height, this.width, this.height);
+            }
+        }
+
+        let bars = [];
+        // --- Initialization ---
+        function init() {
+            bars = [];
+            const barWidth = canvas.width / BAR_COUNT;
+            for (let i = 0; i < BAR_COUNT; i++) {
+                const x = i * barWidth;
+                bars.push(new Bar(x, 0, barWidth, 0, i));
+            }
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw each bar
+            for (const bar of bars) {
+                bar.update();
+                bar.draw();
+            }
+            
+            // Increment the time counter to move the animation forward
+            time++; 
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        // --- Start ---
+        init();
+        animate();
+    </script>
+</body>
+</html>
+
