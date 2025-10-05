@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Rain Background</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000; /* Pure black background */
+            overflow: hidden; /* Hide scrollbars */
+        }
+
+        /* The canvas will be our drawing board */
+        #matrix-canvas {
+            display: block; /* Removes any default spacing */
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <script>
+        // --- 1. SETUP ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Make the canvas fill the entire screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- 2. CHARACTERS ---
+        // The characters that will be raining down.
+        // I've added Latin, Japanese Katakana, numbers, and Gujarati characters.
+        const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンકખગઘઙચછજઝઞટઠડઢણતથદધનપફબભમયરલવશષસહળક્ષજ્ઞ';
+        
+        // Convert the string of characters into an array
+        const characterArray = characters.split('');
+
+        // --- 3. RAIN LOGIC ---
+        const fontSize = 16;
+        // Calculate how many columns of characters we can fit on the screen
+        const columns = Math.floor(canvas.width / fontSize);
+
+        // This array will hold the current Y position (vertical) of the last character in each column.
+        // We start each column at Y=1 so it's visible from the first frame.
+        const drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+
+        // --- 4. THE ANIMATION FUNCTION ---
+        function draw() {
+            // Create the fading trail effect by drawing a semi-transparent black rectangle
+            // over the entire canvas on each frame.
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Set the color and font for the falling characters
+            ctx.fillStyle = '#00f0a0'; // A bright, glowing green
+            ctx.font = fontSize + 'px monospace';
+
+            // Loop through each column
+            for (let i = 0; i < drops.length; i++) {
+                // Get a random character from our array
+                const text = characterArray[Math.floor(Math.random() * characterArray.length)];
+
+                // Calculate the X and Y position to draw the character
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+
+                // Draw the character on the canvas
+                ctx.fillText(text, x, y);
+
+                // Check if the drop has reached the bottom of the screen
+                if (y > canvas.height && Math.random() > 0.975) {
+                    // If it has, reset its Y position back to the top to start over
+                    drops[i] = 0;
+                }
+
+                // Increment the Y position to move the drop down on the next frame
+                drops[i]++;
+            }
+        }
+
+        // Start the animation loop, running the 'draw' function every 33 milliseconds
+        setInterval(draw, 33);
+
+        // --- 5. RESPONSIVENESS ---
+        // Optional: Make the animation resize if the browser window changes size
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Recalculate columns and reset drops array if needed (simplified here)
+        });
+    </script>
+
+</body>
+</html>
