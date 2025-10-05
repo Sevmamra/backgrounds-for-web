@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Flow Background</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .liquid-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background-color: #0f0f23; /* Dark base background */
+            overflow: hidden;
+
+            /* This is the magic! 
+               - The blur filter makes the edges of our blobs fuzzy.
+               - The contrast filter sharpens the edges, but because the blurred edges
+                 overlap, it creates a single, sharp outline around the merged shape.
+               This combination creates the "metaball" or liquid-merging effect.
+            */
+            filter: blur(25px) contrast(20);
+        }
+
+        .blob {
+            position: absolute;
+            background: #ffc107; /* Amber color from your theme */
+            border-radius: 50%;
+            /* The animation will be applied to each blob */
+            animation: move linear infinite;
+        }
+
+        /* We create multiple blobs and give each a unique size, position, and animation speed
+           to make the effect look random and natural. */
+        
+        .blob:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            left: 10%;
+            animation-duration: 25s;
+        }
+
+        .blob:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            left: 70%;
+            animation-duration: 20s;
+            animation-delay: -10s;
+        }
+
+        .blob:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            left: 80%;
+            top: 60%;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .blob:nth-child(4) {
+            width: 180px;
+            height: 180px;
+            left: 30%;
+            top: 70%;
+            animation-duration: 35s;
+            animation-delay: -15s;
+        }
+
+        .blob:nth-child(5) {
+            width: 100px;
+            height: 100px;
+            left: 50%;
+            top: 10%;
+            animation-duration: 22s;
+        }
+        
+         .blob:nth-child(6) {
+            width: 220px;
+            height: 220px;
+            left: 5%;
+            top: 50%;
+            animation-duration: 28s;
+            animation-delay: -20s;
+        }
+
+        /* The keyframe animation moves the blobs around the screen in a loop */
+        @keyframes move {
+            0%   { transform: translate(0, 0) scale(1); }
+            25%  { transform: translate(10vw, 30vh) scale(0.8); }
+            50%  { transform: translate(40vw, -20vh) scale(1.1); }
+            75%  { transform: translate(-30vw, 10vh) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="liquid-container">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+
+</body>
+</html>
