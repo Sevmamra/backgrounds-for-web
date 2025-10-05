@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperdrive Background - Endless Flow</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000000;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hyperdrive-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('hyperdrive-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Configuration ---
+        const STAR_COUNT = 800; // You can increase this if you want an even denser field
+        const SPEED = 2; // Controls the overall speed of the animation
+        const STAR_COLOR = '#ffffff';
+
+        let stars = [];
+
+        // --- Star Class ---
+        class Star {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                // Generate random X and Y positions within a large range
+                // The values are relative to the center of the screen
+                this.x = (Math.random() - 0.5) * canvas.width * 2; // Starts from a wider field
+                this.y = (Math.random() - 0.5) * canvas.height * 2; // Starts from a taller field
+                
+                // Z starts far away, giving depth, randomizing initial depth for variation
+                this.z = Math.random() * (canvas.width * 2); // Random initial depth
+                this.pz = this.z; // Previous Z
+            }
+
+            update() {
+                // Move the star closer to the viewer
+                this.z -= SPEED;
+
+                // If the star passes the viewer (z < 1), reset it to the back
+                if (this.z < 1) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                // Calculate screen coordinates (sx, sy) based on 3D perspective
+                // Divide by z to simulate perspective: farther objects are smaller/closer to center
+                const sx = (this.x / this.z) * (canvas.width / 2) + (canvas.width / 2);
+                const sy = (this.y / this.z) * (canvas.height / 2) + (canvas.height / 2);
+
+                // Calculate previous screen coordinates (psx, psy) for the streak
+                const psx = (this.x / this.pz) * (canvas.width / 2) + (canvas.width / 2);
+                const psy = (this.y / this.pz) * (canvas.height / 2) + (canvas.height / 2);
+                
+                // Calculate radius: smaller when farther, larger when closer
+                const radius = (1 - this.z / (canvas.width * 2)) * 2; // Scale based on max z-depth
+
+                // Draw the "streaking" effect as a line from previous to current position
+                ctx.beginPath();
+                ctx.moveTo(psx, psy);
+                ctx.lineTo(sx, sy);
+                ctx.lineWidth = radius;
+                ctx.strokeStyle = STAR_COLOR;
+                ctx.stroke();
+
+                // Store the current Z position as the previous Z for the next frame
+                this.pz = this.z;
+            }
+        }
+
+        // --- Initialization ---
+        function init() {
+            stars = [];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                stars.push(new Star());
+            }
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            // Semi-transparent background fill for motion blur and fading trails
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // Increased opacity slightly for better trails
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (const star of stars) {
+                star.update();
+                star.draw();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Re-initialize stars to adapt to new screen dimensions
+            init(); 
+        });
+
+        // --- Start ---
+        init();
+        animate();
+    </script>
+</body>
+</html>
