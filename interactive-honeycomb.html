@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Honeycomb</title>
+    <style>
+        body {
+            background-color: #0f0f23;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="honeycomb-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('honeycomb-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- Configuration ---
+        const HEX_RADIUS = 30; // Size of each hexagon
+        const FADE_SPEED = 0.05; // How quickly the glow fades
+        const STROKE_COLOR = 'rgba(255, 193, 7, 0.3)'; // Base color (#ffc107 with opacity)
+        const FILL_COLOR = '#0f0f23';
+        const HIGHLIGHT_COLOR = '#ff9800'; // Brighter orange for highlight
+
+        let hexagons = [];
+        let mouse = { x: undefined, y: undefined };
+
+        // --- Hexagon Class ---
+        class Hexagon {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.brightness = 0; // 0 = dark, 1 = fully lit
+            }
+
+            draw() {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const x_i = this.x + HEX_RADIUS * Math.cos(angle);
+                    const y_i = this.y + HEX_RADIUS * Math.sin(angle);
+                    if (i === 0) {
+                        ctx.moveTo(x_i, y_i);
+                    } else {
+                        ctx.lineTo(x_i, y_i);
+                    }
+                }
+                ctx.closePath();
+
+                // Style based on brightness
+                if (this.brightness > 0) {
+                    ctx.fillStyle = `rgba(255, 152, 0, ${this.brightness * 0.7})`; // Glowing fill
+                    ctx.strokeStyle = `rgba(255, 193, 7, ${0.3 + this.brightness * 0.7})`;
+                    ctx.lineWidth = 2;
+                } else {
+                    ctx.fillStyle = FILL_COLOR;
+                    ctx.strokeStyle = STROKE_COLOR;
+                    ctx.lineWidth = 1;
+                }
+                
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            update() {
+                // Slowly fade the brightness back to 0
+                if (this.brightness > 0) {
+                    this.brightness -= FADE_SPEED;
+                    if (this.brightness < 0) this.brightness = 0;
+                }
+            }
+        }
+
+        // --- Grid Creation ---
+        function init() {
+            hexagons = [];
+            const hexHeight = HEX_RADIUS * Math.sqrt(3);
+            const hexWidth = HEX_RADIUS * 2;
+            const horizontalSpacing = hexWidth * 0.75;
+
+            for (let row = 0; (row * hexHeight / 2) < canvas.height + hexHeight; row++) {
+                for (let col = 0; (col * horizontalSpacing) < canvas.width + hexWidth; col++) {
+                    const xOffset = row % 2 === 0 ? 0 : horizontalSpacing / 2;
+                    const x = col * horizontalSpacing + xOffset;
+                    const y = row * (hexHeight / 2);
+                    hexagons.push(new Hexagon(x, y));
+                }
+            }
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Check for mouse proximity and update brightness
+            for (const hex of hexagons) {
+                const dx = mouse.x - hex.x;
+                const dy = mouse.y - hex.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < HEX_RADIUS * 1.5) { // Activate if mouse is close
+                    hex.brightness = 1; // Set to full brightness
+                }
+                
+                hex.update(); // Fade out
+                hex.draw();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        // --- Start ---
+        init();
+        animate();
+    </script>
+</body>
+</html>
